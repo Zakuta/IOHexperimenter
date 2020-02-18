@@ -12,13 +12,16 @@
 
 static IOHprofiler_random random_methods;
 
+/// \brief This is function to operate dummy transformation on a bit-string
 static std::vector<int> dummy(int number_of_variables, double select_rate, long inseed) {
   std::vector<int> position;
   std::vector<int> random_index;
   std::vector<double> random_numbers;
   int temp;
   int select_num = (int)floor((double)(number_of_variables * select_rate));
-  
+
+  assert(select_num > 0);
+
   position.reserve(number_of_variables);
   for (int i = 0; i != number_of_variables; ++i) {
     position.push_back(i);
@@ -44,6 +47,7 @@ static std::vector<int> dummy(int number_of_variables, double select_rate, long 
   return random_index;
 }
 
+/// \brief This is function to operate neutrality of w-model, which is used on F6 and F13 of PBO Suite.
 static std::vector<int> neutrality(const std::vector<int> &variables, int mu) {
   int number_of_variables = variables.size();
   int n = (int)floor((double)number_of_variables/(double)mu);
@@ -67,6 +71,7 @@ static std::vector<int> neutrality(const std::vector<int> &variables, int mu) {
   return new_variables;
 }
 
+/// \brief This is function to operate epistasis of w-model, which is used on F7 and F14 of PBO Suite.
 static std::vector<int> epistasis(const std::vector<int> &variables, int v) {
   int h, epistasis_result;
   int number_of_variables = variables.size();
@@ -113,6 +118,7 @@ static std::vector<int> epistasis(const std::vector<int> &variables, int v) {
   return new_variables;
 }
 
+/// \brief This is function to operate a ruggedness objective transformation of w-model, which is used on F8 and F16 of PBO Suite.
 static double ruggedness1(double y, int number_of_variables) {
   double ruggedness_y, s;
   s = (double)number_of_variables;
@@ -129,6 +135,7 @@ static double ruggedness1(double y, int number_of_variables) {
   return ruggedness_y;
 }
 
+/// \brief This is function to operate a ruggedness objective transformation of w-model, which is used on F9 and F16 of PBO Suite.
 static double ruggedness2(double y, int number_of_variables) {
   double ruggedness_y;
   int tempy=(int)(y+0.5);
@@ -149,6 +156,7 @@ static double ruggedness2(double y, int number_of_variables) {
   return ruggedness_y;
 }
 
+/// \brief This is function to operate a ruggedness objective transformation of w-model, which is used on F10 and F17 of PBO Suite.
 static std::vector<double> ruggedness3(int number_of_variables) {
   std::vector<double> ruggedness_fitness(number_of_variables+1,0.0);
   
@@ -164,14 +172,20 @@ static std::vector<double> ruggedness3(int number_of_variables) {
   return ruggedness_fitness;
 }
 
-/// Following is the w-model soure code from Raphael's work, which refer the source code of Thomas Weise.
+// Following is the w-model soure code from Raphael's work, which refer the source code of Thomas Weise.
 
+/// \brief This is function to operate neutrality transformation on a bit-string
+///
+/// The code is from Raphael's work, which refers the source code of Thomas Weise.
 static void layer_neutrality_compute(const std::vector<int> &xIn, std::vector<int> &xOut, const int mu){
   int thresholdFor1 = (mu >> 1) + (mu & 1);
   int i,j,ones,flush;
   int temp;
   int dim = xIn.size();
   int temp_dim = dim / mu;
+
+  assert(temp_dim > 0);
+  
   if (xOut.size() != temp_dim) {
     xOut.resize(temp_dim);
   }
@@ -215,17 +229,20 @@ static void base_epistasis(const std::vector<int> &xIn, const int start, const i
 }
 
 static void epistasis_compute(const std::vector<int>  &xIn, std::vector<int> &xOut, const int nu) {
-    const int length = xIn.size();
-    const int end = length - nu;
-    int i;
-    for (i = 0; i <= end; i += nu) {
-      base_epistasis(xIn, i, nu, xOut);
-    }
-    if (i < length) {
-      base_epistasis(xIn, i, length - i, xOut);
-    }
+  const int length = xIn.size();
+  const int end = length - nu;
+  int i;
+  for (i = 0; i <= end; i += nu) {
+    base_epistasis(xIn, i, nu, xOut);
   }
+  if (i < length) {
+    base_epistasis(xIn, i, length - i, xOut);
+  }
+}
 
+/// \brief This is function to operate epistasis transformation on a bit-string
+///
+/// The code is from Raphael's work, which refers the source code of Thomas Weise.
 static void layer_epistasis_compute(const std::vector<int> &x, std::vector<int> &epistasis_x, const int block_size) {
   epistasis_compute(x,epistasis_x,block_size);
 }
@@ -312,8 +329,9 @@ static int ruggedness_translate(int gamma, int q) {
     return (max - k - ((2 * j * j) - j) - ((q % 2) * ((-2 * j) + 1)));
   }
 
-
-
+/// \brief This is function to return the transformed objective with ruggedness of w-model.
+///
+/// The code is from Raphael's work, which refers the source code of Thomas Weise.
 static double layer_compute_ruggedness(const double y, size_t dimension,int gamma){
   double result;
   std::vector<int> r=ruggedness_raw(ruggedness_translate(gamma, dimension), dimension);

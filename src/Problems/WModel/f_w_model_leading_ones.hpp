@@ -1,21 +1,21 @@
-/// \file f_w_model_one_max.hpp
-/// \brief cpp file for class W_Model_OneMax
+/// \file f_w_model_leading_ones.hpp
+/// \brief cpp file for class W_Model_Leading_Ones
 ///
-/// This file implements a OneMax problem with  with customized w-model.
+/// This file implements a LeadingOnes problem with customized w-model.
 ///
 /// \author Furong Ye
-/// \date 2019-08-28
-#ifndef _F_W_MODEL_ONE_MAX_HPP
-#define _F_W_MODEL_ONE_MAX_HPP
+/// \date 2020-02-18
+#ifndef _F_W_MODEL_LEADING_ONES_HPP
+#define _F_W_MODEL_LEADING_ONES_HPP
 
 #include "IOHprofiler_problem.hpp"
 #include "wmodels.hpp"
 
-class W_Model_OneMax : public IOHprofiler_problem<int> {
+class W_Model_Leading_Ones : public IOHprofiler_problem<int> {
 public:
-  W_Model_OneMax(int instance_id = DEFAULT_INSTANCE, int dimension = DEFAULT_DIMENSION) {
+  W_Model_Leading_Ones(int instance_id = DEFAULT_INSTANCE, int dimension = DEFAULT_DIMENSION) {
     IOHprofiler_set_instance_id(instance_id);
-    IOHprofiler_set_problem_name("W_Model_OneMax");
+    IOHprofiler_set_problem_name("W_Model_Leading_Ones");
     IOHprofiler_set_problem_type("pseudo_Boolean_problem");
     IOHprofiler_set_number_of_objectives(1);
     IOHprofiler_set_lowerbound(0);
@@ -24,7 +24,7 @@ public:
     IOHprofiler_set_number_of_variables(dimension);
   }
 
-  ~W_Model_OneMax() {};
+  ~W_Model_Leading_Ones() {};
 
   std::vector<int> dummy_info;
   double dummy_para = 0;
@@ -116,11 +116,14 @@ public:
       layer_epistasis_compute(tempX,w_model_x,this->epistasis_para);
     }
     
-    /// Using the transformed bit string to calculate OM(w_model_x).
+    /// Using the transformed bit string to calculate LO(w_model_x).
     n = w_model_x.size();
     int result = 0;
     for (int i = 0; i != n; ++i) {
-      result += w_model_x[i];
+      if(w_model_x[i] == 1)
+        result = i + 1;
+      else
+        break;
     }
 
     // Transfer the objective value with the ruggedness function.
@@ -131,8 +134,8 @@ public:
     return (double)result;
   }
 
-  static W_Model_OneMax * createInstance(int instance_id = DEFAULT_INSTANCE, int dimension = DEFAULT_DIMENSION) {
-    return new W_Model_OneMax(instance_id, dimension);
+  static W_Model_Leading_Ones * createInstance(int instance_id = DEFAULT_INSTANCE, int dimension = DEFAULT_DIMENSION) {
+    return new W_Model_Leading_Ones(instance_id, dimension);
   }
 };
 
