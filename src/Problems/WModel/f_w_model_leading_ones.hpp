@@ -30,7 +30,7 @@ public:
   double dummy_para = 0;
   int epistasis_para = 0;
   int neutrality_para = 0;
-  int ruggedness_para = 0;
+  double ruggedness_para = 0;
   std::vector<int> ruggedness_info;
   int temp_dimension;
   void prepare_problem() {
@@ -51,27 +51,29 @@ public:
 
     if (this->neutrality_para < 0 || this->neutrality_para >= this->temp_dimension) {
       this->neutrality_para = 0;
-      IOH_warning("neutrality parameter is out of the domain and will be set a 0 (No transformation)");
+      IOH_warning("neutrality parameter is out of the domain and will be set a 0 (No transformation).");
     }
 
     if (this->neutrality_para > 0) {
-      this->temp_dimension = this->temp_dimension / this->neutrality_para;
+      this->temp_dimension = floor(this->temp_dimension / this->neutrality_para);
     }
     
     assert(this->temp_dimension > 0);
 
-    if (this->epistasis_para <= 2 || this->epistasis_para >= this->temp_dimension) {
-      this->epistasis_para = 0;
-      IOH_warning("epistasis parameter is out of the domain and will be set a 0 (No transformation)");
+    if (this->epistasis_para <= 2 || this->epistasis_para >= this->temp_dimension ) {
+      if (this->epistasis_para != 0) {
+        this->epistasis_para = 0;
+        IOH_warning("epistasis parameter is out of the domain and will be set a 0 (No transformation).");
+      }
     }
 
-    if (this->ruggedness_para < 0 || this->ruggedness_para > this->temp_dimension * (this->temp_dimension - 1) / 2 ) {
+    if (this->ruggedness_para < 0 || this->ruggedness_para > 1) {
       this->ruggedness_para = 0;
-      IOH_warning("ruggedness parameter is out of the domain and will be set a 0 (No transformation)");
+      IOH_warning("ruggedness parameter is out of the domain and will be set a 0 (No transformation).");
     }
 
     if (this->ruggedness_para > 0) {
-      this->ruggedness_info = ruggedness_raw(ruggedness_translate(this->ruggedness_para, this->temp_dimension), this->temp_dimension); 
+      this->ruggedness_info = ruggedness_raw(ruggedness_translate(this->ruggedness_para * (this->temp_dimension * (this->temp_dimension - 1) / 2), this->temp_dimension), this->temp_dimension); 
     }
   }
 
@@ -82,7 +84,7 @@ public:
     IOHprofiler_set_optimal((double)optimal_value);
   }
 
-  void set_w_setting(const double dummy_para, const int epistasis_para, const int neutrality_para, const int ruggedness_para) {
+  void set_w_setting(const double dummy_para, const int epistasis_para, const int neutrality_para, const double ruggedness_para) {
     this->dummy_para = dummy_para;
     this->epistasis_para = epistasis_para;
     this->neutrality_para = neutrality_para;
@@ -95,7 +97,7 @@ public:
     int n;
     
     // dummy
-    if (this->dummy_para > 0){
+    if (this->dummy_para > 0 && this->dummy_info.size() != 0) {
       n = this->dummy_info.size();
       w_model_x.reserve(n);
       for (int i = 0; i != n; ++i) {
