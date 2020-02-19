@@ -20,7 +20,6 @@ public:
     IOHprofiler_set_number_of_objectives(1);
     IOHprofiler_set_lowerbound(0);
     IOHprofiler_set_upperbound(1);
-    IOHprofiler_set_best_variables(1);
     IOHprofiler_set_number_of_variables(dimension);
   }
 
@@ -79,7 +78,7 @@ public:
 
   void customize_optimal() {
     int dimension = IOHprofiler_get_number_of_variables();
-    int optimal_value = (int)(dimension*(this->dummy_para == 0 ? 1 : this->dummy_para)) / (this->neutrality_para == 0 ? 1 : this->neutrality_para);
+    int optimal_value = floor(floor(dimension*(this->dummy_para == 0 ? 1 : this->dummy_para)) / (this->neutrality_para == 0 ? 1 : this->neutrality_para));
 
     IOHprofiler_set_optimal((double)optimal_value);
   }
