@@ -60,11 +60,18 @@ public:
 
   void reset_observer(const int optimization_type);
 
-  virtual void do_log(const std::vector<double> &log_info) {}
+  virtual void do_log() {}
 
-  virtual void track_problem(const IOHprofiler_problem<int> & problem) {}
+  virtual void track_problem(IOHprofiler_problem<int> & problem) {}
   
-  virtual void track_problem(const IOHprofiler_problem<double> & problem) {}
+  virtual void track_problem(IOHprofiler_problem<double> & problem) {}
+
+  // Updated here.
+  virtual void track_problem(std::shared_ptr< IOHprofiler_problem<int> >  problem) {}
+  
+  // Updated here.
+  virtual void track_problem(std::shared_ptr< IOHprofiler_problem<double> > problem) {}
+  
   // Adding virtual functions for more IuputType IOHprofiler_problem.
 
 private:

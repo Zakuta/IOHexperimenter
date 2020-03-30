@@ -204,7 +204,8 @@ void IOHprofiler_csv_logger::track_problem(const int problem_id, const int dimen
 ///
 /// This function is to be invoked by IOHprofiler_problem class.
 /// To update info of current working problem, and to write headline in corresponding files.
-void IOHprofiler_csv_logger::track_problem(const IOHprofiler_problem<int> & problem) {
+// Updated here.
+void IOHprofiler_csv_logger::track_problem(IOHprofiler_problem<int> & problem) {
   // this->tracked_problem_int = nullptr;
   // this->tracked_problem_double = nullptr;
 
@@ -216,11 +217,14 @@ void IOHprofiler_csv_logger::track_problem(const IOHprofiler_problem<int> & prob
     problem.IOHprofiler_get_optimization_type()
   );
   
-  // this->problem_type = problem.IOHprofiler_get_problem_type();
-  // this->tracked_problem_int = std::make_shared<IOHprofiler_problem<int> >(problem);
+  problem.link_logger(std::bind(&IOHprofiler_csv_logger::do_log,this));
+  this->problem_type = problem.IOHprofiler_get_problem_type();
+  this->tracked_problem_int = std::shared_ptr<IOHprofiler_problem<int> >(&problem);
+
 }
 
-void IOHprofiler_csv_logger::track_problem(const IOHprofiler_problem<double> & problem) {
+// Updated here.
+void IOHprofiler_csv_logger::track_problem(IOHprofiler_problem<double> & problem) {
   // this->tracked_problem_int = nullptr;
   // this->tracked_problem_double = nullptr;
   this->track_problem(
@@ -231,8 +235,45 @@ void IOHprofiler_csv_logger::track_problem(const IOHprofiler_problem<double> & p
     problem.IOHprofiler_get_optimization_type()
   );
   
-  // this->problem_type = problem.IOHprofiler_get_problem_type();
-  // this->tracked_problem_double = std::make_shared<IOHprofiler_problem<double> >(problem);
+  problem.link_logger(std::bind(&IOHprofiler_csv_logger::do_log,this));
+  this->problem_type = problem.IOHprofiler_get_problem_type();
+  this->tracked_problem_double = std::shared_ptr<IOHprofiler_problem<double> >(&problem);
+}
+
+// Updated here.
+void IOHprofiler_csv_logger::track_problem(std::shared_ptr< IOHprofiler_problem<int> > problem) {
+  // this->tracked_problem_int = nullptr;
+  // this->tracked_problem_double = nullptr;
+
+  this->track_problem(
+    problem->IOHprofiler_get_problem_id(), 
+    problem->IOHprofiler_get_number_of_variables(), 
+    problem->IOHprofiler_get_instance_id(),
+    problem->IOHprofiler_get_problem_name(),
+    problem->IOHprofiler_get_optimization_type()
+  );
+  
+  problem->link_logger(std::bind(&IOHprofiler_csv_logger::do_log,this));
+  this->problem_type = problem->IOHprofiler_get_problem_type();
+  this->tracked_problem_int = problem;
+
+}
+
+// Updated here.
+void IOHprofiler_csv_logger::track_problem(std::shared_ptr< IOHprofiler_problem<double> > problem) {
+  // this->tracked_problem_int = nullptr;
+  // this->tracked_problem_double = nullptr;
+  this->track_problem(
+    problem->IOHprofiler_get_problem_id(), 
+    problem->IOHprofiler_get_number_of_variables(), 
+    problem->IOHprofiler_get_instance_id(),
+    problem->IOHprofiler_get_problem_name(),
+    problem->IOHprofiler_get_optimization_type()
+  );
+  
+  problem->link_logger(std::bind(&IOHprofiler_csv_logger::do_log,this));
+  this->problem_type = problem->IOHprofiler_get_problem_type();
+  this->tracked_problem_double = problem;
 }
 
 void IOHprofiler_csv_logger::track_suite(std::string suite_name){
@@ -265,7 +306,18 @@ void IOHprofiler_csv_logger::set_parameters(const std::vector<std::shared_ptr<do
   }
 }
 
-void IOHprofiler_csv_logger::do_log(const std::vector<double> & log_info) {
+// Updated here.
+void IOHprofiler_csv_logger::do_log() {
+  if (this->problem_type == "bbob") {
+    this->write_line(this->tracked_problem_double->loggerCOCOInfo() );
+  } else if (this->problem_type == "pseudo_Boolean_problem") {
+    this->write_line(this->tracked_problem_int->loggerInfo() );
+  } else {
+    IOH_warning("No tracking IOHprofiler_problem class");
+  }
+};
+
+void IOHprofiler_csv_logger::write_line(const std::vector<double> & log_info) {
   this->write_line( (size_t)(log_info[0]),log_info[1],log_info[2],log_info[3],log_info[4]);
 };
 

@@ -290,6 +290,8 @@ public:
 
   void IOHprofiler_set_as_minimization();
 
+  void link_logger( std::function<void ()> do_log);
+
 private:
   int problem_id; /// < problem id, assigned as being added into a suite.
   int instance_id; /// < evaluate function is validated with instance and dimension. set default to avoid invalid class.
@@ -328,6 +330,8 @@ private:
   int best_so_far_raw_evaluations; /// < to record optimization process.
   std::vector<double> best_so_far_transformed_objectives; /// < to record optimization process.
   int best_so_far_transformed_evaluations; /// < to record optimization process.
+
+  std::function<void ()> do_log;
 };
 
 template <class InputType> double IOHprofiler_problem<InputType>::evaluate(std::vector<InputType> x) {
@@ -365,7 +369,9 @@ template <class InputType> double IOHprofiler_problem<InputType>::evaluate(std::
   }
 
   return this->transformed_objectives[0];
-  //IOHprofiler_csv_logger::do_log()
+
+  // For logging.
+  this->do_log();
 }
 
 template <class InputType> void IOHprofiler_problem<InputType>::calc_optimal() {
@@ -643,6 +649,11 @@ template <class InputType> void IOHprofiler_problem<InputType>::IOHprofiler_set_
     this->best_so_far_raw_objectives[i] = DBL_MAX;
     this->best_so_far_transformed_objectives[i] = DBL_MAX;
   }
+}
+
+// Updated here.
+template <class InputType> void IOHprofiler_problem<InputType>::link_logger(std::function<void ()> do_log) {
+  this->do_log = do_log;
 }
 
 #endif //_IOHPROFILER_PROBLEM_H

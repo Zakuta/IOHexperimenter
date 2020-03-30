@@ -33,9 +33,13 @@ public:
 
   void track_problem(const int problem_id, const int dimension, const int instance, const std::string problem_name, const int maximization_minimization_flag);
   
-  void track_problem(const IOHprofiler_problem<int> & problem);
+  void track_problem(IOHprofiler_problem<int> & problem);
   
-  void track_problem(const IOHprofiler_problem<double> & problem);
+  void track_problem(IOHprofiler_problem<double> & problem);
+
+  void track_problem(std::shared_ptr< IOHprofiler_problem<int> >  problem);
+  
+  void track_problem(std::shared_ptr< IOHprofiler_problem<double> > problem);
 
   void track_suite(std::string suite_name);
 
@@ -46,7 +50,10 @@ public:
 
   void write_line(const size_t evaluations, const double y, const double best_so_far_y,
                  const double transformed_y, const double best_so_far_transformed_y);
-  void do_log(const std::vector<double> &log_info);
+  
+  void write_line(const std::vector<double> &log_info);
+  
+  void do_log();
   
   void update_logger_info(size_t optimal_evaluations, double y, double transformed_y);
   
@@ -68,7 +75,7 @@ private:
   int problem_id;
   int instance;
   std::string problem_name;
-  //std::string problem_type;
+  std::string problem_type;
 
   std::fstream cdat;
   std::fstream idat;
@@ -105,8 +112,8 @@ private:
   /// \brief to create the folder of logging files.
   int openIndex();
 
-  // std::shared_ptr<IOHprofiler_problem<int> >  tracked_problem_int;
-  // std::shared_ptr<IOHprofiler_problem<double> > tracked_problem_double;
+  std::shared_ptr<IOHprofiler_problem<int> >  tracked_problem_int;
+  std::shared_ptr<IOHprofiler_problem<double> > tracked_problem_double;
 };
 
 #endif //_IOHPROFILER_CSV_LOGGER_H

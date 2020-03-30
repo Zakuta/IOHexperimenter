@@ -34,7 +34,7 @@ void evolutionary_algorithm(std::shared_ptr<IOHprofiler_problem<int>> problem, s
   x = Initialization(problem->IOHprofiler_get_number_of_variables());
   x_star = x;
   y = problem->evaluate(x);
-  logger->do_log(problem->loggerInfo());
+  //logger->do_log(problem->loggerInfo());
   best_value = y;
 
   int count= 0;
@@ -42,7 +42,7 @@ void evolutionary_algorithm(std::shared_ptr<IOHprofiler_problem<int>> problem, s
     x = x_star;
     if (mutation(x,mutation_rate)) {
       y = problem->evaluate(x);
-      logger->do_log(problem->loggerInfo());
+      //logger->do_log(problem->loggerInfo());
     }
     if (y > best_value) {
       best_value = y;
@@ -78,11 +78,12 @@ void _run_suite() {
 
   /// Problems are tested one by one until 'get_next_problem' returns NULL.
   while ((problem = pbo.get_next_problem()) != nullptr) {
-    logger->track_problem(problem->IOHprofiler_get_problem_id(), 
-                          problem->IOHprofiler_get_number_of_variables(), 
-                          problem->IOHprofiler_get_instance_id(),
-                          problem->IOHprofiler_get_problem_name(),
-                          problem->IOHprofiler_get_optimization_type());
+    // logger->track_problem(problem->IOHprofiler_get_problem_id(), 
+    //                       problem->IOHprofiler_get_number_of_variables(), 
+    //                       problem->IOHprofiler_get_instance_id(),
+    //                       problem->IOHprofiler_get_problem_name(),
+    //                       problem->IOHprofiler_get_optimization_type());
+    logger->track_problem(problem);
     evolutionary_algorithm(problem,logger);
   }
 }

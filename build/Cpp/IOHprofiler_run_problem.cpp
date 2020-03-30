@@ -67,11 +67,12 @@ void _run_w_model() {
   while (restart_flag < 10) {
     /// reset_problem must be called before testing the same problem class repeatedly.
     w_model_om.reset_problem();
-    logger.track_problem(w_model_om.IOHprofiler_get_problem_id(), 
-                        w_model_om.IOHprofiler_get_number_of_variables(), 
-                        w_model_om.IOHprofiler_get_instance_id(),
-                        w_model_om.IOHprofiler_get_problem_name(),
-                        w_model_om.IOHprofiler_get_optimization_type());
+    // logger.track_problem(w_model_om.IOHprofiler_get_problem_id(), 
+    //                     w_model_om.IOHprofiler_get_number_of_variables(), 
+    //                     w_model_om.IOHprofiler_get_instance_id(),
+    //                     w_model_om.IOHprofiler_get_problem_name(),
+    //                     w_model_om.IOHprofiler_get_optimization_type());
+    logger.track_problem(w_model_om);
   
 
     /***
@@ -87,7 +88,7 @@ void _run_w_model() {
     x = Initialization(dimension);
     x_star = x;
     y = w_model_om.evaluate(x);
-    logger.do_log(w_model_om.loggerInfo());
+    //logger.do_log(w_model_om.loggerInfo());
     best_value = y;
 
     int budget = 10000;
@@ -95,7 +96,7 @@ void _run_w_model() {
       x = x_star;
       if(mutation(x,mutation_rate)) {
         y = w_model_om.evaluate(x);
-        logger.do_log(w_model_om.loggerInfo());
+        //logger.do_log(w_model_om.loggerInfo());
         budget--;
       }
       if(y > best_value) {
@@ -152,7 +153,7 @@ void _run_problem() {
     if(mutation(x,mutation_rate)) {
       y = om.evaluate(x);
       //logger.do_log();
-      logger.do_log(om.loggerInfo());
+      //logger.do_log(om.loggerInfo());
     }
     if(y > best_value) {
       best_value = y;
